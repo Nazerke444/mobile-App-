@@ -1,61 +1,79 @@
 import React, { useState } from 'react';
-import { SafeAreaView, StatusBar } from 'react-native';
-
 import OnboardingScreen from './src/screens/OnboardingScreen';
 import PreferencesScreen from './src/screens/PreferencesScreen';
 import SubscriptionScreen from './src/screens/SubscriptionScreen';
 import LoginScreen from './src/screens/LoginScreen';
 import SignUpScreen from './src/screens/SignUpScreen';
+import ConfirmationScreen from './src/screens/ConfirmationScreen';
+import SettingsScreen from './src/screens/SettingsScreen';
 
-export type ScreenName =
+type Screen =
   | 'onboarding'
   | 'preferences'
   | 'subscription'
   | 'login'
-  | 'signup';
+  | 'signup'
+  | 'confirmation'
+  | 'settings';
 
 export default function App() {
-  const [screen, setScreen] =
-    useState<ScreenName>('onboarding');
+  const [currentScreen, setCurrentScreen] = useState<Screen>('onboarding');
 
-  return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: '#FFFFFF' }}>
-      <StatusBar barStyle="dark-content" />
-
-      {screen === 'onboarding' && (
+  switch (currentScreen) {
+    case 'onboarding':
+      return (
         <OnboardingScreen
-          onNext={() => setScreen('preferences')}
+          onNext={() => setCurrentScreen('preferences')}
         />
-      )}
+      );
 
-      {screen === 'preferences' && (
+    case 'preferences':
+      return (
         <PreferencesScreen
-          onBack={() => setScreen('onboarding')}
-          onNext={() => setScreen('subscription')}
+          onBack={() => setCurrentScreen('onboarding')}
+          onNext={() => setCurrentScreen('subscription')}
         />
-      )}
+      );
 
-      {screen === 'subscription' && (
+    case 'subscription':
+      return (
         <SubscriptionScreen
-          onBack={() => setScreen('preferences')}
-          onNext={() => setScreen('login')}
+          onBack={() => setCurrentScreen('preferences')}
+          onNext={() => setCurrentScreen('login')}
         />
-      )}
+      );
 
-      {screen === 'login' && (
+    case 'login':
+      return (
         <LoginScreen
-          onSignUp={() => setScreen('signup')}
-          onForgotPassword={() =>
-            alert('Құпиясөзді қалпына келтіру')
-          }
+          onSignUp={() => setCurrentScreen('signup')}
+          onForgotPassword={() => setCurrentScreen('confirmation')}
         />
-      )}
+      );
 
-      {screen === 'signup' && (
+    case 'signup':
+      return (
         <SignUpScreen
-          onLogin={() => setScreen('login')}
+          onLogin={() => setCurrentScreen('login')}
         />
-      )}
-    </SafeAreaView>
-  );
+      );
+
+    case 'confirmation':
+      return (
+        <ConfirmationScreen
+          onBack={() => setCurrentScreen('login')}
+          onContinue={() => setCurrentScreen('settings')}
+        />
+      );
+
+    case 'settings':
+      return (
+        <SettingsScreen
+          onLogout={() => setCurrentScreen('login')}
+        />
+      );
+
+    default:
+      return null;
+  }
 }

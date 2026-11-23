@@ -1,38 +1,32 @@
 import React, { useState } from 'react';
-
 import {
   View,
   Text,
   TextInput,
   StyleSheet,
   Pressable,
+  SafeAreaView,
 } from 'react-native';
+import Button from '../components/button';
 
 type Props = {
   onSignUp: () => void;
   onForgotPassword: () => void;
 };
 
-export default function LoginScreen({
-  onSignUp,
-  onForgotPassword,
-}: Props) {
-
+export default function LoginScreen({ onSignUp, onForgotPassword }: Props) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
 
   return (
-    <View style={styles.container}>
-
+    <SafeAreaView style={styles.container}>
       <View style={styles.imagePlaceholder}>
         <Text style={styles.imageIcon}>▧</Text>
       </View>
 
       <View style={styles.form}>
-
-        <Text style={styles.title}>
-          Welcome!
-        </Text>
+        <Text style={styles.title}>Welcome!</Text>
 
         <TextInput
           style={styles.input}
@@ -43,170 +37,162 @@ export default function LoginScreen({
           autoCapitalize="none"
         />
 
-        <TextInput
-          style={styles.input}
-          placeholder="Password"
-          value={password}
-          onChangeText={setPassword}
-          secureTextEntry
-        />
+        <View style={styles.passwordContainer}>
+          <TextInput
+            style={styles.passwordInput}
+            placeholder="Password"
+            value={password}
+            onChangeText={setPassword}
+            secureTextEntry={!showPassword}
+          />
+          <Pressable
+            onPress={() => setShowPassword(!showPassword)}
+            style={styles.eyeBtn}
+          >
+            <Text style={styles.eyeText}>{showPassword ? '🙈' : '👁'}</Text>
+          </Pressable>
+        </View>
 
         <Pressable onPress={onForgotPassword}>
-          <Text style={styles.forgot}>
-            Forgot password?
-          </Text>
+          <Text style={styles.forgot}>Forgot password?</Text>
         </Pressable>
 
-        <Pressable
-          style={styles.button}
+        <Button
+          title="Login"
           onPress={() => alert('Login батырмасы басылды')}
-        >
-          <Text style={styles.buttonText}>
-            Login
-          </Text>
-        </Pressable>
+        />
 
         <Text style={styles.registerText}>
           Not a member?{' '}
-          <Text
-            style={styles.link}
-            onPress={onSignUp}
-          >
+          <Text style={styles.link} onPress={onSignUp}>
             Register now
           </Text>
         </Text>
 
         <View style={styles.line} />
 
-        <Text style={styles.or}>
-          Or continue with
-        </Text>
+        <Text style={styles.or}>Or continue with</Text>
 
         <View style={styles.socials}>
-          <Text style={[styles.social, { backgroundColor: '#E9364D' }]}>
-            G
-          </Text>
+          <Pressable style={[styles.socialBtn, { backgroundColor: '#E9364D' }]}>
+            <Text style={styles.socialText}>G</Text>
+          </Pressable>
 
-          <Text style={[styles.social, { backgroundColor: '#202126' }]}>
-            ●
-          </Text>
+          <Pressable style={[styles.socialBtn, { backgroundColor: '#202126' }]}>
+            <Text style={styles.socialText}></Text>
+          </Pressable>
 
-          <Text style={[styles.social, { backgroundColor: '#0875F9' }]}>
-            f
-          </Text>
+          <Pressable style={[styles.socialBtn, { backgroundColor: '#0875F9' }]}>
+            <Text style={styles.socialText}>f</Text>
+          </Pressable>
         </View>
-
       </View>
-    </View>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-
   container: {
     flex: 1,
     backgroundColor: '#FFFFFF',
   },
-
   imagePlaceholder: {
-    height: '34%',
+    height: '32%',
     backgroundColor: '#EAF2FF',
     alignItems: 'center',
     justifyContent: 'center',
     marginHorizontal: 16,
-    marginTop: 16,
+    marginTop: 12,
+    borderRadius: 12,
   },
-
   imageIcon: {
     color: '#9CCFFF',
     fontSize: 34,
   },
-
   form: {
     flex: 1,
     paddingHorizontal: 28,
-    paddingTop: 24,
+    paddingTop: 22,
   },
-
   title: {
     fontSize: 23,
     fontWeight: '800',
     color: '#111827',
-    marginBottom: 20,
+    marginBottom: 18,
   },
-
   input: {
     height: 48,
     borderWidth: 1,
     borderColor: '#D9DDE5',
     borderRadius: 10,
     paddingHorizontal: 14,
-    marginBottom: 10,
+    marginBottom: 12,
     fontSize: 13,
   },
-
+  passwordContainer: {
+    height: 48,
+    borderWidth: 1,
+    borderColor: '#D9DDE5',
+    borderRadius: 10,
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 14,
+    marginBottom: 8,
+  },
+  passwordInput: {
+    flex: 1,
+    fontSize: 13,
+  },
+  eyeBtn: {
+    padding: 4,
+  },
+  eyeText: {
+    fontSize: 14,
+    color: '#858B98',
+  },
   forgot: {
     color: '#0875F9',
     fontSize: 12,
-    marginTop: 2,
-    marginBottom: 18,
+    fontWeight: '600',
+    marginBottom: 20,
   },
-
-  button: {
-    height: 48,
-    borderRadius: 9,
-    backgroundColor: '#0875F9',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-
-  buttonText: {
-    color: '#FFFFFF',
-    fontWeight: '700',
-  },
-
   registerText: {
     textAlign: 'center',
     color: '#858B98',
     fontSize: 12,
     marginTop: 16,
   },
-
   link: {
     color: '#0875F9',
     fontWeight: '700',
   },
-
   line: {
     height: 1,
     backgroundColor: '#E7EAF0',
-    marginTop: 24,
+    marginTop: 22,
   },
-
   or: {
     textAlign: 'center',
     color: '#858B98',
     fontSize: 12,
     marginTop: 16,
   },
-
   socials: {
     flexDirection: 'row',
     justifyContent: 'center',
     gap: 14,
     marginTop: 14,
   },
-
-  social: {
-    width: 34,
-    height: 34,
+  socialBtn: {
+    width: 36,
+    height: 36,
     borderRadius: 18,
-    color: '#FFFFFF',
-    textAlign: 'center',
-    textAlignVertical: 'center',
-    overflow: 'hidden',
-    fontWeight: '800',
-    paddingTop: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
-
+  socialText: {
+    color: '#FFFFFF',
+    fontWeight: '800',
+    fontSize: 15,
+  },
 });
