@@ -6,18 +6,46 @@ import {
   StyleSheet,
   Pressable,
   SafeAreaView,
+  ActivityIndicator,
 } from 'react-native';
 import Button from '../components/button';
+import { api } from '../services/api';
 
 type Props = {
   onSignUp: () => void;
   onForgotPassword: () => void;
+  onLoginSuccess?: () => void;
 };
 
-export default function LoginScreen({ onSignUp, onForgotPassword }: Props) {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+export default function LoginScreen({
+  onSignUp,
+  onForgotPassword,
+  onLoginSuccess,
+}: Props) {
+  const [email, setEmail] = useState('emilys');
+  const [password, setPassword] = useState('emilyspass');
   const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  const handleLogin = async () => {
+    if (!email.trim() || !password.trim()) {
+      alert('Email немесе құпиясөзді енгізіңіз.');
+      return;
+    }
+
+    try {
+      setLoading(true);
+      const user = await api.login(email.trim(), password);
+      alert(`Қош келдіңіз, ${user.firstName}!`);
+      if (onLoginSuccess) {
+        onLoginSuccess();
+      }
+    } catch (error: any) {
+      alert(error.message || 'Кіру кезінде қате шықты');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -57,10 +85,11 @@ export default function LoginScreen({ onSignUp, onForgotPassword }: Props) {
           <Text style={styles.forgot}>Forgot password?</Text>
         </Pressable>
 
-        <Button
-          title="Login"
-          onPress={() => alert('Login батырмасы басылды')}
-        />
+        {loading ? (
+          <ActivityIndicator size="large" color="#0875F9" style={{ marginVertical: 10 }} />
+        ) : (
+          <Button title="Login" onPress={handleLogin} />
+        )}
 
         <Text style={styles.registerText}>
           Not a member?{' '}

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -7,22 +7,16 @@ import {
   Pressable,
   FlatList,
   SafeAreaView,
+  Image,
+  ActivityIndicator,
   Modal,
 } from 'react-native';
 import Button from '../components/button';
+import { api } from '../services/api';
 
 type Props = {
   onBack: () => void;
 };
-
-const products = [
-  { id: '1', title: 'Amazing Shoes', price: '€ 12.00', color: 'BLUE' },
-  { id: '2', title: 'Fabulous Shoes', price: '€ 15.00', color: 'GREEN' },
-  { id: '3', title: 'Fantastic Shoes', price: '€ 15.00', color: 'BLACK' },
-  { id: '4', title: 'Spectacular Shoes', price: '€ 12.00', color: 'WHITE' },
-  { id: '5', title: 'Stunning Shoes', price: '€ 12.00', color: 'RED' },
-  { id: '6', title: 'Wonderful Shoes', price: '€ 15.00', color: 'GREEN' },
-];
 
 const colors = [
   'BLACK', 'WHITE', 'GREY', 'YELLOW',
@@ -31,13 +25,32 @@ const colors = [
 ];
 
 export default function SearchScreen({ onBack }: Props) {
-  const [query, setQuery] = useState('Shoes');
+  const [query, setQuery] = useState('shoes');
+  const [products, setProducts] = useState<any[]>([]);
+  const [loading, setLoading] = useState(false);
   const [filterVisible, setFilterVisible] = useState(false);
   const [selectedColor, setSelectedColor] = useState('GREEN');
 
-  const filteredProducts = products.filter(p =>
-    p.title.toLowerCase().includes(query.toLowerCase())
-  );
+  useEffect(() => {
+    let active = true;
+    setLoading(true);
+
+    api
+      .searchProducts(query)
+      .then(items => {
+        if (active) {
+          setProducts(items || []);
+          setLoading(false);
+        }
+      })
+      .catch(() => {
+        if (active) setLoading(false);
+      });
+
+    return () => {
+      active = false;
+    };
+  }, [query]);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -51,7 +64,7 @@ export default function SearchScreen({ onBack }: Props) {
             style={styles.searchInput}
             value={query}
             onChangeText={setQuery}
-            placeholder="Search products..."
+            placeholder="Search products (e.g. phone, watch)..."
           />
           {query.length > 0 && (
             <Pressable onPress={() => setQuery('')}>
@@ -77,26 +90,34 @@ export default function SearchScreen({ onBack }: Props) {
         </Pressable>
       </View>
 
-      <FlatList
-        data={filteredProducts}
-        numColumns={2}
-        keyExtractor={item => item.id}
-        contentContainerStyle={styles.grid}
-        columnWrapperStyle={{ gap: 12 }}
-        renderItem={({ item }) => (
-          <View style={styles.card}>
-            <View style={styles.cardImage}>
-              <Text style={styles.cardIcon}>▧</Text>
+      {loading ? (
+        <ActivityIndicator size="large" color="#0875F9" style={{ marginTop: 40 }} />
+      ) : (
+        <FlatList
+          data={products}
+          numColumns={2}
+          keyExtractor={item => item.id.toString()}
+          contentContainerStyle={styles.grid}
+          columnWrapperStyle={{ gap: 12 }}
+          renderItem={({ item }) => (
+            <View style={styles.card}>
+              <Image
+                source={{ uri: item.thumbnail }}
+                style={styles.cardImage}
+                resizeMode="cover"
+              />
+              <View style={styles.cardBody}>
+                <Text style={styles.cardTitle} numberOfLines={1}>
+                  {item.title}
+                </Text>
+                <Text style={styles.cardPrice}>€ {item.price}</Text>
+              </View>
             </View>
-            <View style={styles.cardBody}>
-              <Text style={styles.cardTitle}>{item.title}</Text>
-              <Text style={styles.cardPrice}>{item.price}</Text>
-            </View>
-          </View>
-        )}
-      />
+          )}
+        />
+      )}
 
-      {/* Сүзгі (Filter) модалы */}
+      {/* Сүзгі (Filter) терезесі */}
       <Modal
         visible={filterVisible}
         animationType="slide"
@@ -235,14 +256,14 @@ const styles = StyleSheet.create({
     backgroundColor: '#F8FAFC',
     borderRadius: 14,
     overflow: 'hidden',
+    borderWidth: 1,
+    borderColor: '#E7EAF0',
   },
   cardImage: {
     height: 120,
+    width: '100%',
     backgroundColor: '#EAF2FF',
-    alignItems: 'center',
-    justifyContent: 'center',
   },
-  cardIcon: { fontSize: 28, color: '#9CCFFF' },
   cardBody: { padding: 12 },
   cardTitle: { fontSize: 13, color: '#202633', marginBottom: 4 },
   cardPrice: { fontSize: 14, fontWeight: '800', color: '#111827' },

@@ -52,6 +52,7 @@ export default function App() {
         <LoginScreen
           onSignUp={() => setCurrentScreen('signup')}
           onForgotPassword={() => setCurrentScreen('confirmation')}
+          onLoginSuccess={() => setCurrentScreen('chats')}
         />
       );
 
@@ -88,7 +89,12 @@ export default function App() {
       return <SearchScreen onBack={() => setCurrentScreen('projects')} />;
 
     case 'settings':
-      return <SettingsScreen onLogout={() => setCurrentScreen('login')} />;
+      return (
+        <SettingsScreen
+          onLogout={() => setCurrentScreen('login')}
+          onNavigateTab={tab => setCurrentScreen(tab)}
+        />
+      );
 
     default:
       return null;
